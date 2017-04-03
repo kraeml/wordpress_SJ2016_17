@@ -1,0 +1,74 @@
+---
+# tasks file for mysql
+- name: Set MySQL root password before installing
+  debconf:
+    name: "mysql-server"
+    question: "mysql-server/root_password"
+    value: "{{MYSQL_ROOT_PASSWORD | quote}}"
+    vtype: "password"
+- name: Confirm MySQL root password before installing
+  debconf:
+    name: "mysql-server"
+    question: "mysql-server/root_password_again"
+    value: "{{MYSQL_ROOT_PASSWORD | quote}}"
+    vtype: "password"
+
+- name: Install Packages
+  apt:
+    name: "{{item}}"
+    update_cache: yes
+    cache_valid_time: 3600
+  with_items: "{{PACKAGES}}"
+
+- name: New MySQL config
+  template:
+    src: mysqld.cnf
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+  notify: restart_mysql
+
+- name: Deletes anonymous MySQL server user for localhost
+  mysql_user:
+    user: ""
+    state: "absent"
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+    login_user: root
+
+- name: Secures the MySQL root user
+  mysql_user:
+    user: "root"
+    password: "{{ MYSQL_ROOT_PASSWORD }}"
+    host: "{{ item }}"
+    login_password: "{{MYSQL_ROOT_PASSWORD}}"
+    login_user: root
+    priv: "*.*:ALL,GRANT"
+  with_items:
+    - 127.0.0.1
+    - localhost
+    - ::1
+    - "{{ ansible_fqdn }}"
+
+- name: Removes the MySQL test database
+  mysql_db:
+    db: test
+    state: absent
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+    login_user: root
+
+- name: Create the WP database
+  mysql_db:
+    login_password: "{{MYSQL_ROOT_PASSWORD}}"
+    login_user: root
+    db: "{{WP_DB_NAME}}"
+    state: present
+
+- name: Create the WP user
+  mysql_user:
+    user: "{{WP_DB_USERNAME}}"
+    password: "{{WP_DB_PASSWORD}}"
+    host: "{{ item }}"
+    priv: "{{WP_DB_NAME}}.*:ALL,GRANT"
+    login_password: "{{MYSQL_ROOT_PASSWORD}}"
+    login_user: root
+  with_items:
+    - localhost
+    - "{{WP_IP}}"

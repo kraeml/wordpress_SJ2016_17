@@ -1,0 +1,10 @@
+---
+# defaults file for php
+PACKAGES:
+  - php
+  - php-mysql
+  - php-curl
+  - php-gd
+  - mysql-client
+  - php-mbstring
+  - php-xml

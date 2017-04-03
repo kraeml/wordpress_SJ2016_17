@@ -1,0 +1,15 @@
+---
+# tasks file for php
+- name: Install Packages
+  apt:
+    name: "{{item}}"
+    update_cache: yes
+    cache_valid_time: 3600
+  with_items: "{{PACKAGES}}"
+
+- name: PHP info
+  copy:
+    src: php-info.php
+    dest: /var/www/html/php-info.php
+    owner: www-data
+    group: www-data

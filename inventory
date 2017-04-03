@@ -1,0 +1,5 @@
+[wp]
+wordpress ansible_connection=local
+
+[db]
+mysql ansible_connection=local

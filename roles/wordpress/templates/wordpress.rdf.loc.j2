@@ -1,0 +1,19 @@
+server {
+  listen 80;
+  server_name {{WP_DOMAIN}} www.{{WP_DOMAIN}};
+
+  root {{WP_PATH}}/public;
+  index index.php;
+
+  access_log {{WP_PATH}}/logs/access.log;
+  error_log {{WP_PATH}}/logs/error.log;
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+  }
+}

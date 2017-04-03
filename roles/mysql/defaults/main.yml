@@ -1,0 +1,12 @@
+---
+# defaults file for mysql
+MY_DOMAIN: "mysql.rdf.loc"
+WP_DB_NAME: "wordpress"
+WP_DB_USERNAME: "wordpress"
+WP_DB_PASSWORD: "wordpress"
+WP_IP: 192.168.68.21
+MYSQL_ROOT_PASSWORD: "root"
+DB_IP: 192.168.68.22
+PACKAGES:
+  - mysql-server
+  - python-mysqldb
